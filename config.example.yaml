@@ -1,0 +1,33 @@
+# Only benchmark systems you own or have explicit permission to test.
+target:
+  url: "http://127.0.0.1:8787/ok"
+  allowed_hosts:
+    - "127.0.0.1"
+    - "localhost"
+
+benchmark:
+  requests_per_case: 20
+  concurrency: 4
+  timeout_seconds: 10
+  delay_between_batches_ms: 100
+  success_status_min: 200
+  success_status_max: 399
+  max_requests_per_case: 500
+  max_concurrency: 20
+
+cases:
+  baseline:
+    enabled: true
+
+  aws_gateway:
+    enabled: false
+    gateway_base_url: ""
+
+  mobile_proxy:
+    enabled: false
+    proxy_url: ""
+
+  ipv6:
+    enabled: false
+    source_addresses:
+      - "::1"
