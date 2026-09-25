@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "egress-benchmark"
+version = "0.1.0"
+description = "Authorized egress benchmark: direct vs AWS gateway vs mobile proxy vs configured IPv6 source addresses"
+requires-python = ">=3.10"
+dependencies = [
+  "httpx[socks]==0.27.2",
+  "PyYAML==6.0.2",
+  "boto3==1.35.24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==8.3.3", "pytest-asyncio==0.24.0"]
+
+[project.scripts]
+egress-bench = "egress_bench.cli:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
