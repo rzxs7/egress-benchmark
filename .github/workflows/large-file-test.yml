@@ -1,0 +1,53 @@
+name: 300 MiB large-file test
+
+on:
+  push:
+    paths:
+      - ".github/workflows/large-file-test.yml"
+  workflow_dispatch:
+
+jobs:
+  generate-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate 300 MiB incompressible test file
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import os
+
+          target = Path("large-test-300MiB.bin")
+          total = 300 * 1024 * 1024
+          chunk = 4 * 1024 * 1024
+
+          with target.open("wb") as f:
+              remaining = total
+              while remaining:
+                  n = min(chunk, remaining)
+                  f.write(os.urandom(n))
+                  remaining -= n
+
+          assert target.stat().st_size == total
+          print(f"Created {target}: {target.stat().st_size} bytes")
+          PY
+
+      - name: Verify size and hash
+        shell: bash
+        run: |
+          set -euo pipefail
+          ls -lh large-test-300MiB.bin
+          stat --printf="bytes=%s\n" large-test-300MiB.bin
+          sha256sum large-test-300MiB.bin | tee large-test-300MiB.sha256
+
+      - name: Upload 300 MiB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: large-test-300MiB
+          path: |
+            large-test-300MiB.bin
+            large-test-300MiB.sha256
+          compression-level: 0
+          retention-days: 1
+          if-no-files-found: error
